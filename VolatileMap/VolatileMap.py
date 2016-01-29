@@ -40,7 +40,7 @@ class VolatileMap(object):
       self.__map[key] = value
     return value
 
-  def save():
+  def save(self):
     if self.__writeBack:
       self.__map.sync(self.__map)
 
