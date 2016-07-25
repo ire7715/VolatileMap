@@ -1,29 +1,38 @@
-from VolatileMap.VolatileMap import VolatileMap
+from VolatileMap import VolatileMap
 import time
+import unittest
 
-def main():
-  regularMap = VolatileMap("test.shelve", \
+class TestRegularVolatileMap(unittest.TestCase):
+  def setUp(self):
+    self.regular = VolatileMap("test.shelve", \
     getValue=lambda data: data[1], \
     volatiled=lambda tup: time.time() - float(tup[0]) > 2)
-  print("rM.overwrite: " + str(regularMap.overwrite))
-  try:
-    regularMap.overwrite = True
-    print("rM.overwrite after set: " + str(regularMap.overwrite))
-  except AttributeError:
-    print("rM.overwrite can't be set")
+    # default writeBack=False, overwrite=True
 
-  print("rM[\"k\"] before assignment: " + str(regularMap["k"]))
-  regularMap["k"] = (time.time(), "v")
-  print("rM[\"k\"]: " + str(regularMap["k"]))
-  regularMap["k"] = (time.time(), "w")
-  print("rM[\"k\"] true assignment: " + str(regularMap["k"]))
-  print("wait few seconds...")
-  time.sleep(3)
-  print("rM[\"k\"] after sleep: " + str(regularMap["k"]))
+  @unittest.expectedFailure
+  def testSetOverwrite(self):
+    self.regular.overwrite = False
 
-  regularMap = None
+  def testValues(self):
+    key = "k"
+    values = [(time.time(), "v"), (time.time(), "w")]
+    self.assertEqual(self.regular[key], None, \
+      "Initial self.regular[%s] should be None" % key)
 
-  return
+    self.regular[key] = values[0]
+    self.assertEqual(self.regular[key], values[0][1], \
+      "After assignment self.regular[%s] should be %s" % (key, values[0][1]))
+
+    self.regular[key] = values[1]
+    self.assertEqual(self.regular[key], values[1][1], \
+      "After overwrite self.regular[%s] should be %s" % (key, values[1][1]))
+
+    time.sleep(3)
+
+    self.assertEqual(self.regular[key], None, \
+      "After sleep self.regular[%s] should be None" % key)
+
+    del self.regular
 
 if __name__ == "__main__":
-  main()
+  unittest.main()

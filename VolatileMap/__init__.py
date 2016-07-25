@@ -1,1 +1,2 @@
-import VolatileMap
+__all__ = ["VolatileMap"]
+from VolatileMap import VolatileMap
