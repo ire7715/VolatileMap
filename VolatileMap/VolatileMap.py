@@ -57,6 +57,6 @@ class VolatileMap(object):
 
   def __clean(self):
     if self.__volatility:
-      for key in self.__map.iteritems():
+      for key in self.__map.keys():
         if not self.__exists(key):
           del self.__map[key]
